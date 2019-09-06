@@ -217,7 +217,7 @@ func removeAllDir(dirName string) {
 
 func getPathsJSON(local snet.Addr, remote snet.Addr, network snet.SCIONNetwork) ([]byte, error) {
 	pathMgr := network.PathResolver()
-	pathSet := pathMgr.Query(context.Background(), local.IA, remote.IA)
+	pathSet := pathMgr.Query(context.Background(), local.IA, remote.IA, sciond.PathReqFlags{})
 	if len(pathSet) == 0 {
 		return nil, fmt.Errorf("No paths from %s to %s", local.IA, remote.IA)
 	}
