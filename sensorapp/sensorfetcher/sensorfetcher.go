@@ -6,7 +6,8 @@ package main
 import (
 	"flag"
 	"fmt"
-	"log"
+    "github.com/scionproto/scion/go/lib/sock/reliable"
+    "log"
 
 	"github.com/netsec-ethz/scion-apps/lib/scionutil"
 	"github.com/scionproto/scion/go/lib/sciond"
@@ -74,7 +75,7 @@ func main() {
 	} else if sciondPath == "" {
 		sciondPath = sciond.GetDefaultSCIONDPath(nil)
 	}
-	snet.Init(local.IA, sciondPath, dispatcherPath)
+	snet.Init(local.IA, sciondPath, reliable.NewDispatcherService(dispatcherPath))
 	udpConnection, err = snet.DialSCION("udp4", local, remote)
 	check(err)
 

@@ -8,7 +8,8 @@ import (
 	"encoding/binary"
 	"flag"
 	"fmt"
-	"io/ioutil"
+    "github.com/scionproto/scion/go/lib/sock/reliable"
+    "io/ioutil"
 	"log"
 	"time"
 
@@ -207,7 +208,7 @@ func main() {
 	} else if sciondPath == "" {
 		sciondPath = sciond.GetDefaultSCIONDPath(nil)
 	}
-	snet.Init(local.IA, sciondPath, dispatcherPath)
+	snet.Init(local.IA, sciondPath, reliable.NewDispatcherService(dispatcherPath))
 	udpConnection, err = snet.DialSCION("udp4", local, remote)
 	check(err)
 

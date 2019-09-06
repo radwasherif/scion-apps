@@ -18,7 +18,8 @@ import (
 	"context"
 	"flag"
 	"fmt"
-	"os"
+    "github.com/scionproto/scion/go/lib/sock/reliable"
+    "os"
 
 	"github.com/netsec-ethz/scion-apps/lib/scionutil"
 	"github.com/scionproto/scion/go/lib/sciond"
@@ -38,7 +39,6 @@ func main() {
 	var err error
 	var clientCCAddrStr string
 	var serverCCAddrStr string
-	dispatcherPath := scionutil.GetDefaultDispatcher()
 	// get local and remote addresses from program arguments:
 	flag.StringVar(&clientCCAddrStr, "local", "", "Local SCION Address (e.g. 17-ffaa:1:1,[127.0.0.1]:0)")
 	flag.StringVar(&serverCCAddrStr, "remote", "", "Remote SCION Address (e.g. 17-ffaa:1:1,[127.0.0.1]:12345)")
@@ -57,7 +57,7 @@ func main() {
 	// get the daemon socket file path:
 	sciondPath := sciond.GetDefaultSCIONDPath(nil)
 	// initialize SCION
-	err = snet.Init(clientCCAddr.IA, sciondPath, dispatcherPath)
+	err = snet.Init(clientCCAddr.IA, sciondPath, reliable.NewDispatcherService("/run/shm/dispatcher/default.sock"))
 	Check(err)
 	// query paths from here to there:
 	pathMgr := snet.DefNetwork.PathResolver()

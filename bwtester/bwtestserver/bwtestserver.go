@@ -8,7 +8,8 @@ import (
 	"bytes"
 	"flag"
 	"fmt"
-	"os"
+    "github.com/scionproto/scion/go/lib/sock/reliable"
+    "os"
 	"strconv"
 	"strings"
 	"sync"
@@ -149,7 +150,7 @@ func runServer() {
 		*sciondPath = sciond.GetDefaultSCIONDPath(nil)
 	}
 	log.Info("Starting server")
-	snet.Init(serverCCAddr.IA, *sciondPath, *dispatcherPath)
+	snet.Init(serverCCAddr.IA, *sciondPath, reliable.NewDispatcherService(*dispatcherPath))
 
 	serverISDASIP := fmt.Sprintf("%s,[%s]", serverCCAddr.IA, serverCCAddr.Host.L3)
 

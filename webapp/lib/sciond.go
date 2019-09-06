@@ -6,7 +6,9 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
-	"io"
+    "github.com/scionproto/scion/go/lib/sciond"
+    "github.com/scionproto/scion/go/lib/sock/reliable"
+    "io"
 	"io/ioutil"
 	"net/http"
 	"os"
@@ -63,12 +65,12 @@ func getNetworkByIA(iaCli string) (*snet.SCIONNetwork, error) {
 	dispatcherPath := "/run/shm/dispatcher/default.sock"
 	sciondPath := scionutil.GetSCIONDPath(&ia)
 	if snet.DefNetwork == nil {
-		err := snet.Init(ia, sciondPath, dispatcherPath)
+		err := snet.Init(ia, sciondPath, reliable.NewDispatcherService(dispatcherPath))
 		if CheckError(err) {
 			return nil, err
 		}
 	}
-	network, err := snet.NewNetwork(ia, sciondPath, dispatcherPath)
+	network, err := snet.NewNetwork(ia, sciondPath, reliable.NewDispatcherService(dispatcherPath))
 	if CheckError(err) {
 		return nil, err
 	}

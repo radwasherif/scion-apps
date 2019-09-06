@@ -7,7 +7,8 @@ import (
 	"bufio"
 	"flag"
 	"fmt"
-	"log"
+    "github.com/scionproto/scion/go/lib/sock/reliable"
+    "log"
 	"os"
 	"strings"
 	"sync"
@@ -128,7 +129,7 @@ func main() {
 	} else if sciondPath == "" {
 		sciondPath = sciond.GetDefaultSCIONDPath(nil)
 	}
-	snet.Init(server.IA, sciondPath, dispatcherPath)
+	snet.Init(server.IA, sciondPath, reliable.NewDispatcherService(dispatcherPath))
 	udpConnection, err = snet.ListenSCION("udp4", server)
 	check(err)
 

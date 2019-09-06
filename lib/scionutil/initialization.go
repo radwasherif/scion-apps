@@ -16,7 +16,8 @@ package scionutil
 
 import (
 	"fmt"
-	"io/ioutil"
+    "github.com/scionproto/scion/go/lib/sock/reliable"
+    "io/ioutil"
 	"os"
 	"path/filepath"
 
@@ -30,7 +31,7 @@ const localhost = "localhost"
 // InitSCION initializes the default SCION networking context with the provided SCION address
 // and the default SCIOND/SCION dispatcher
 func InitSCION(localAddr *snet.Addr) error {
-	err := snet.Init(localAddr.IA, GetSCIONDPath(&localAddr.IA), GetDefaultDispatcher())
+	err := snet.Init(localAddr.IA, GetSCIONDPath(&localAddr.IA), reliable.NewDispatcherService("/run/shm/dispatcher/default.sock"))
 	if err != nil {
 		return err
 	}
@@ -57,11 +58,6 @@ func GetSCIONDPath(ia *addr.IA) string {
 	}
 	// otherwise, use socket with ia name:
 	return sciond.GetDefaultSCIONDPath(ia)
-}
-
-// GetDefaultDispatcher returns the path to the default SCION dispatcher
-func GetDefaultDispatcher() string {
-	return "/run/shm/dispatcher/default.sock"
 }
 
 // GetLocalhost returns a local SCION address an application can bind to
