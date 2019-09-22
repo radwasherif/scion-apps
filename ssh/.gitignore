@@ -1,4 +1,3 @@
 *.pem
 server/authorized_keys
 *.idea
-.gitignore

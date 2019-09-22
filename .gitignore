@@ -30,6 +30,7 @@ webapp/data
 .jshintrc
 .project
 .settings/
+idea/*
 
 *.log
 
@@ -56,3 +57,8 @@ roughtime/timeserver/timeserver
 
 # vscode workspace
 *.code-workspace
+*.vscode/*
+
+# certificates
+*.pem
+authorized_keys
