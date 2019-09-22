@@ -2,6 +2,7 @@ package main
 
 import (
 	"fmt"
+	"github.com/scionproto/scion/go/lib/sciond"
 	golog "log"
 	"net"
 	"os"
@@ -36,15 +37,17 @@ var (
 	verbose       = kingpin.Flag("verbose", "Be verbose").Short('v').Default("false").Bool()
 	configFiles   = kingpin.Flag("config", "Configuration files").Short('c').Default("/etc/ssh/ssh_config", "~/.ssh/config").Strings()
 	xDead         = kingpin.Flag("x-dead", "Placeholder for SCP support").Short('x').Default("false").Bool()
+	clientAddrStr	  = kingpin.Flag("client-address", "SCION address of the client").Default("").String()
 
 	// TODO: additional file paths
 	knownHostsFile = kingpin.Flag("known-hosts", "File where known hosts are stored").ExistingFile()
 	identityFile   = kingpin.Flag("identity", "Identity (private key) file").Short('i').ExistingFile()
 
 	loginName = kingpin.Flag("login-name", "Username to login with").String()
-)
+	clientCCAddr *snet.Addr
+	err error
+	)
 
-var clientCCAddr *snet.Addr
 
 // PromptPassword prompts the user for a password to authenticate with.
 func PromptPassword() (secret string, err error) {
@@ -124,12 +127,19 @@ func main() {
 		golog.Panicf("Can't find current user: %s", err)
 	}
 
-	localhost, err := scionutil.GetLocalhost()
-	if err != nil {
-		golog.Panicf("Can't get localhost: %v", err)
+
+
+	if *clientAddrStr == "" {
+		clientCCAddr, err = scionutil.GetLocalhost()
+		if err != nil {
+			golog.Panicf("Can't get localhost: %v", err)
+		}
+	} else {
+		clientCCAddr, err = snet.AddrFromString(*clientAddrStr)
 	}
 
-	err = scionutil.InitSCION(localhost)
+	sciondPath := sciond.GetDefaultSCIONDPath(&clientCCAddr.IA)
+	err = snet.Init(clientCCAddr.IA, sciondPath , scionutil.GetDefaultDispatcher())
 	if err != nil {
 		golog.Panicf("Error initializing SCION: %v", err)
 	}
