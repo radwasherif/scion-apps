@@ -26,13 +26,13 @@ func SplitHostPort(hostport string) (host, port string, err error) {
 }
 
 // DialSCION dials a SCION host and opens a new QUIC stream
-func DialSCION(remoteAddress string) (*quicconn.QuicConn, error) {
-	localhost, err := scionutil.GetLocalhostString()
-	if err != nil {
-		return nil, err
-	}
+func DialSCION(localAddress string, remoteAddress string) (*quicconn.QuicConn, error) {
+	//localhost, err := scionutil.GetLocalhostString()
+	//if err != nil {
+	//	return nil, err
+	//}
 
-	localAddress := fmt.Sprintf("%v:%v", localhost, 0)
+	//localAddress := fmt.Sprintf("%v:%v", localhost, 0)
 
 	localCCAddr, err := snet.AddrFromString(localAddress)
 	if err != nil {

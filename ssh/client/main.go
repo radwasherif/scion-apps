@@ -168,7 +168,7 @@ func main() {
 
 	serverAddress := fmt.Sprintf("%s:%v", conf.HostAddress, conf.Port)
 
-	err = sshClient.Connect(serverAddress)
+	err = sshClient.Connect(*clientAddrStr, serverAddress)
 	if err != nil {
 		golog.Panicf("Error connecting: %v", err)
 	}

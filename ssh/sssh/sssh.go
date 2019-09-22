@@ -11,8 +11,8 @@ import (
 )
 
 // DialSCION starts a client connection to the given SSH server over SCION using QUIC.
-func DialSCION(addr string, config *ssh.ClientConfig) (*ssh.Client, error) {
-	transportStream, err := scionutils.DialSCION(addr)
+func DialSCION(clientAddr string, addr string, config *ssh.ClientConfig) (*ssh.Client, error) {
+	transportStream, err := scionutils.DialSCION(clientAddr, addr)
 	if err != nil {
 		return nil, err
 	}
