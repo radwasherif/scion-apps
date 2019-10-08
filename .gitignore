@@ -30,7 +30,7 @@ webapp/data
 .jshintrc
 .project
 .settings/
-idea/*
+*/.idea/*
 
 *.log
 
@@ -62,3 +62,10 @@ roughtime/timeserver/timeserver
 # certificates
 *.pem
 authorized_keys
+
+# silly script
+silly.sh
+
+# path policies in SSH
+policy.json
+.gitignore

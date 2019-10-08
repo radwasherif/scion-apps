@@ -2,6 +2,7 @@ package scionutils
 
 import (
 	"fmt"
+	"github.com/scionproto/scion/go/lib/appconf"
 	"regexp"
 
 	"github.com/lucas-clemente/quic-go"
@@ -26,14 +27,15 @@ func SplitHostPort(hostport string) (host, port string, err error) {
 }
 
 // DialSCION dials a SCION host and opens a new QUIC stream
-func DialSCION(localAddress string, remoteAddress string) (*quicconn.QuicConn, error) {
-	//localhost, err := scionutil.GetLocalhostString()
-	//if err != nil {
-	//	return nil, err
-	//}
+func DialSCION(localAddress string, remoteAddress string, appConf *appconf.AppConf) (*quicconn.QuicConn, error) {
+	if localAddress == "" {
+		localhost, err := scionutil.GetLocalhostString()
+		if err != nil {
+			return nil, err
+		}
 
-	//localAddress := fmt.Sprintf("%v:%v", localhost, 0)
-
+		localAddress = fmt.Sprintf("%v:%v", localhost, 0)
+	}
 	localCCAddr, err := snet.AddrFromString(localAddress)
 	if err != nil {
 		return nil, err
@@ -48,7 +50,7 @@ func DialSCION(localAddress string, remoteAddress string) (*quicconn.QuicConn, e
 		KeepAlive: true,
 	}
 
-	sess, err := squic.DialSCION(nil, localCCAddr, remoteCCAddr, quicConfig)
+	sess, err := squic.DialSCIONWithConf(nil, localCCAddr, remoteCCAddr, quicConfig, appConf)
 	if err != nil {
 		return nil, err
 	}
@@ -82,3 +84,7 @@ func ListenSCION(port uint16) (quic.Listener, error) {
 
 	return listener, nil
 }
+
+//func GetPredicateEval() (bool, error){
+//	return
+//}

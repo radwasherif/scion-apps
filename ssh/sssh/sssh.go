@@ -2,6 +2,7 @@ package sssh
 
 import (
 	"errors"
+	"github.com/scionproto/scion/go/lib/appconf"
 	"net"
 	"time"
 
@@ -11,8 +12,9 @@ import (
 )
 
 // DialSCION starts a client connection to the given SSH server over SCION using QUIC.
-func DialSCION(clientAddr string, addr string, config *ssh.ClientConfig) (*ssh.Client, error) {
-	transportStream, err := scionutils.DialSCION(clientAddr, addr)
+func DialSCION(clientAddr string, addr string, config *ssh.ClientConfig, appConf *appconf.AppConf) (*ssh.Client, error) {
+	transportStream, err := scionutils.DialSCION(clientAddr, addr, appConf)
+
 	if err != nil {
 		return nil, err
 	}
@@ -21,7 +23,6 @@ func DialSCION(clientAddr string, addr string, config *ssh.ClientConfig) (*ssh.C
 	if err != nil {
 		return nil, err
 	}
-
 	return ssh.NewClient(conn, nc, rc), nil
 }
 

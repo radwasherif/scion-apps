@@ -3,6 +3,7 @@ package ssh
 import (
 	"crypto/sha256"
 	"fmt"
+	"github.com/scionproto/scion/go/lib/appconf"
 	"io"
 	"io/ioutil"
 	"net"
@@ -38,14 +39,17 @@ type Client struct {
 
 	client  *ssh.Client
 	session *ssh.Session
+	appConf *appconf.AppConf
 }
 
 // Create creates a new unconnected Client.
-func Create(username string, config *clientconfig.ClientConfig, passAuthHandler AuthenticationHandler, verifyNewKeyHandler VerifyHostKeyHandler) (*Client, error) {
+func Create(username string, config *clientconfig.ClientConfig, passAuthHandler AuthenticationHandler,
+	verifyNewKeyHandler VerifyHostKeyHandler, appConf *appconf.AppConf) (*Client, error) {
 	client := &Client{
 		config: &ssh.ClientConfig{
 			User: username,
 		},
+		appConf: appConf,
 	}
 
 	var authMethods []ssh.AuthMethod
@@ -98,7 +102,7 @@ func Create(username string, config *clientconfig.ClientConfig, passAuthHandler 
 
 // Connect connects the Client to the given address.
 func (client *Client) Connect(clientAddr string, addr string) error {
-	goClient, err := sssh.DialSCION(clientAddr, addr, client.config)
+	goClient, err := sssh.DialSCION(clientAddr, addr, client.config, client.appConf)
 	if err != nil {
 		return err
 	}
