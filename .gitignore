@@ -63,9 +63,8 @@ roughtime/timeserver/timeserver
 *.pem
 authorized_keys
 
-# silly script
-silly.sh
-
 # path policies in SSH
 policy.json
-.gitignore
+
+# IntelliJ IDEA workspace
+.idea/
