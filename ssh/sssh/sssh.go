@@ -12,8 +12,8 @@ import (
 )
 
 // DialSCION starts a client connection to the given SSH server over SCION using QUIC.
-func DialSCION(clientAddr string, addr string, config *ssh.ClientConfig, appConf *appconf.AppConf) (*ssh.Client, error) {
-	transportStream, err := scionutils.DialSCION(clientAddr, addr, appConf)
+func DialSCION(clientAddr string, addr string, config *ssh.ClientConfig) (*ssh.Client, error) {
+	transportStream, err := scionutils.DialSCION(clientAddr, addr)
 
 	if err != nil {
 		return nil, err
@@ -25,7 +25,20 @@ func DialSCION(clientAddr string, addr string, config *ssh.ClientConfig, appConf
 	}
 	return ssh.NewClient(conn, nc, rc), nil
 }
+// DialSCION starts a client connection to the given SSH server over SCION using QUIC.
+func DialSCIONWithConf(clientAddr string, addr string, config *ssh.ClientConfig, appConf *appconf.AppConf) (*ssh.Client, error) {
+	transportStream, err := scionutils.DialSCIONWithConf(clientAddr, addr, appConf)
 
+	if err != nil {
+		return nil, err
+	}
+
+	conn, nc, rc, err := ssh.NewClientConn(transportStream, transportStream.RemoteAddr().String(), config)
+	if err != nil {
+		return nil, err
+	}
+	return ssh.NewClient(conn, nc, rc), nil
+}
 // TunnelDialSCION creates a tunnel using the given SSH client.
 func TunnelDialSCION(client *ssh.Client, addr string) (net.Conn, error) {
 	openChannelData := directSCIONData{

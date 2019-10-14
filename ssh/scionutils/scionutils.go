@@ -27,7 +27,43 @@ func SplitHostPort(hostport string) (host, port string, err error) {
 }
 
 // DialSCION dials a SCION host and opens a new QUIC stream
-func DialSCION(localAddress string, remoteAddress string, appConf *appconf.AppConf) (*quicconn.QuicConn, error) {
+func DialSCION(localAddress string, remoteAddress string) (*quicconn.QuicConn, error) {
+	if localAddress == "" {
+		localhost, err := scionutil.GetLocalhostString()
+		if err != nil {
+			return nil, err
+		}
+
+		localAddress = fmt.Sprintf("%v:%v", localhost, 0)
+	}
+	localCCAddr, err := snet.AddrFromString(localAddress)
+	if err != nil {
+		return nil, err
+	}
+
+	remoteCCAddr, err := snet.AddrFromString(remoteAddress)
+	if err != nil {
+		return nil, err
+	}
+
+	quicConfig := &quic.Config{
+		KeepAlive: true,
+	}
+
+	sess, err := squic.DialSCION(nil, localCCAddr, remoteCCAddr, quicConfig)
+	if err != nil {
+		return nil, err
+	}
+
+	stream, err := sess.OpenStreamSync()
+	if err != nil {
+		return nil, err
+	}
+
+	return &quicconn.QuicConn{Session: sess, Stream: stream}, nil
+}
+// DialSCION dials a SCION host and opens a new QUIC stream
+func DialSCIONWithConf(localAddress string, remoteAddress string, appConf *appconf.AppConf) (*quicconn.QuicConn, error) {
 	if localAddress == "" {
 		localhost, err := scionutil.GetLocalhostString()
 		if err != nil {
@@ -62,7 +98,6 @@ func DialSCION(localAddress string, remoteAddress string, appConf *appconf.AppCo
 
 	return &quicconn.QuicConn{Session: sess, Stream: stream}, nil
 }
-
 // ListenSCION listens on the given port with the QUIC protocol, and returns a listener
 func ListenSCION(port uint16) (quic.Listener, error) {
 	localhost, err := scionutil.GetLocalhostString()

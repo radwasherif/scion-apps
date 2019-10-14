@@ -173,7 +173,6 @@ func main() {
 	}
 	var policyMap pathpol.PolicyMap
 	var policy *pathpol.Policy
-	var policyExists bool
 	if *policyFile != "" {
 		file, err := ioutil.ReadFile(*policyFile)
 		if err != nil {
@@ -183,10 +182,12 @@ func main() {
 		if err != nil {
 			golog.Panicf("Cannot unmarshal policy form file: %v", err)
 		}
-		policy, policyExists = policyMap[*policyName]
-		if (!policyExists) {
+		extPolicy, policyExists := policyMap[*policyName]
+
+		if !policyExists {
 			golog.Panicf("No policy with name %s exists", *policyName)
 		}
+		policy = extPolicy.Policy
 	}
 	appConf, err := appconf.NewAppConf(policy, *pathSelection)
 	if err != nil {

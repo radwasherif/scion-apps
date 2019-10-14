@@ -102,7 +102,7 @@ func Create(username string, config *clientconfig.ClientConfig, passAuthHandler 
 
 // Connect connects the Client to the given address.
 func (client *Client) Connect(clientAddr string, addr string) error {
-	goClient, err := sssh.DialSCION(clientAddr, addr, client.config, client.appConf)
+	goClient, err := sssh.DialSCIONWithConf(clientAddr, addr, client.config, client.appConf)
 	if err != nil {
 		return err
 	}
