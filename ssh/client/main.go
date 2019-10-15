@@ -137,23 +137,28 @@ func main() {
 
 
 
-	if *clientAddrStr == "" {
+	if *clientAddrStr == "" { //connect via default.sock --> used for running on scionlab AS
 		clientCCAddr, err = scionutil.GetLocalhost()
 		if err != nil {
 			golog.Panicf("Can't get localhost: %v", err)
+		}
+		err = scionutil.InitSCION(clientCCAddr)
+		if err != nil {
+			golog.Panicf("Error initializing SCION: %v", err)
 		}
 	} else {
 		clientCCAddr, err = snet.AddrFromString(*clientAddrStr)
 		if err != nil {
 			golog.Panicf("Cannot get client local address from string: %v", err)
 		}
+		sciondPath := sciond.GetDefaultSCIONDPath(&clientCCAddr.IA)
+		err = snet.Init(clientCCAddr.IA, sciondPath , scionutil.GetDefaultDispatcher())
+		if err != nil {
+			golog.Panicf("Error initializing SCION: %v", err)
+		}
 	}
 
-	sciondPath := sciond.GetDefaultSCIONDPath(&clientCCAddr.IA)
-	err = snet.Init(clientCCAddr.IA, sciondPath , scionutil.GetDefaultDispatcher())
-	if err != nil {
-		golog.Panicf("Error initializing SCION: %v", err)
-	}
+
 
 	err = squic.Init(utils.ParsePath(conf.QUICKeyPath), utils.ParsePath(conf.QUICCertificatePath))
 	if err != nil {
