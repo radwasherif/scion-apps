@@ -1,8 +1,11 @@
 package scionutils
 
 import (
+	"crypto/tls"
 	"fmt"
-	"github.com/scionproto/scion/go/lib/appconf"
+	"github.com/netsec-ethz/scion-apps/ssh/conn_wrapper"
+	"github.com/scionproto/scion/go/lib/addr"
+	"github.com/netsec-ethz/scion-apps/ssh/appconf"
 	"regexp"
 
 	"github.com/lucas-clemente/quic-go"
@@ -86,7 +89,7 @@ func DialSCIONWithConf(localAddress string, remoteAddress string, appConf *appco
 		KeepAlive: true,
 	}
 
-	sess, err := squic.DialSCIONWithConf(nil, localCCAddr, remoteCCAddr, quicConfig, appConf)
+	sess, err := DialSCIONWithBindSVCWithConf(localCCAddr, remoteCCAddr, nil, addr.SvcNone, quicConfig, appConf)
 	if err != nil {
 		return nil, err
 	}
@@ -120,6 +123,18 @@ func ListenSCION(port uint16) (quic.Listener, error) {
 	return listener, nil
 }
 
-//func GetPredicateEval() (bool, error){
-//	return
-//}
+func DialSCIONWithBindSVCWithConf(laddr, raddr, baddr *snet.Addr,
+	svc addr.HostSVC, quicConfig *quic.Config, conf *appconf.AppConf) (quic.Session, error) {
+
+	sconn, err := snet.DefNetwork.ListenSCIONWithBindSVC("udp4", laddr, baddr, svc, 0)
+	wrappedConn := conn_wrapper.NewConnWrapper(sconn, conf)
+	if err != nil {
+		return nil, err
+	}
+	// Use dummy hostname, as it's used for SNI, and we're not doing cert verification.
+	return quic.Dial(wrappedConn, raddr, "host:0", &tls.Config{InsecureSkipVerify:true}, quicConfig)
+}
+
+
+
+
