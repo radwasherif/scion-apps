@@ -3,7 +3,7 @@ package ssh
 import (
 	"crypto/sha256"
 	"fmt"
-	"github.com/scionproto/scion/go/lib/appconf"
+	"github.com/netsec-ethz/scion-apps/ssh/appconf"
 	"io"
 	"io/ioutil"
 	"net"
