@@ -2,7 +2,7 @@ package sssh
 
 import (
 	"errors"
-	"github.com/scionproto/scion/go/lib/appconf"
+	"github.com/netsec-ethz/scion-apps/ssh/appconf"
 	"net"
 	"time"
 
