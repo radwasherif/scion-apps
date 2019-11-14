@@ -126,7 +126,8 @@ func updateConfigFromFile(conf *clientconfig.ClientConfig, pth string) {
 func main() {
 	kingpin.Parse()
 	//scionlog.SetupLogConsole("debug")
-	scionlog.SetupLogFile("pathlog", "/home/radwa/go/src/github.com/netsec-ethz/scion-apps/ssh/client", "debug", 10, 10, 100, 0 )
+	dir, _ := os.Getwd()
+	scionlog.SetupLogFile("pathlog", dir, "debug", 10, 10, 100, 0 )
 
 	conf := createConfig()
 
