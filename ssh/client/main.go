@@ -3,7 +3,7 @@ package main
 import (
 	"encoding/json"
 	"fmt"
-	"github.com/scionproto/scion/go/lib/appconf"
+	"github.com/netsec-ethz/scion-apps/ssh/appconf"
 	"github.com/scionproto/scion/go/lib/pathpol"
 	"github.com/scionproto/scion/go/lib/sciond"
 	"io/ioutil"
