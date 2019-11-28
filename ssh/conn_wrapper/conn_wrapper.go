@@ -61,7 +61,7 @@ func (c *ConnWrapper) WriteTo(b []byte, raddr net.Addr) (int, error) {
 			appPath = pathSet.GetAppPath("")
 			nextHop, path, err = c.getSCIONPath(appPath)
 			if err != nil {
-				return 0, common.NewBasicError("Writer: error creating SCION path", err)
+				return 0, common.NewBasicError("ConnWrapper: Static : error creating SCION path", err)
 			}
 			c.conf.SetStaticPath(nextHop, path)
 			_, pathTest := c.conf.GetStaticPath()
@@ -75,11 +75,13 @@ func (c *ConnWrapper) WriteTo(b []byte, raddr net.Addr) (int, error) {
 
 	} else if c.conf.PathSelection().IsArbitrary() {
 		log.Debug("ARBITRARY PATH ===> ")
+		log.Debug("Local IA:", localIA.String())
+		log.Debug("Remote IA:", address.IA.String())
 		pathSet := resolver.Query(context.Background(), localIA, address.IA, sciond.PathReqFlags{})
 		appPath = pathSet.GetAppPath("")
 		nextHop, path, err = c.getSCIONPath(appPath)
 		if err != nil {
-			return 0, common.NewBasicError("Writer: error creating SCION path", err)
+			return 0, common.NewBasicError(fmt.Sprintf("Conn Wrapper: Arbitrary : error getting SCION path between client %v and server %v", localIA.String(), address.IA.String()), err)
 		}
 		log.Debug(fmt.Sprintf("SELECTED PATH %s\n", appPath.Entry.Path.String()))
 
